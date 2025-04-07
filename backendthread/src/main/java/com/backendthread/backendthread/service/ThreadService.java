@@ -1,5 +1,6 @@
 package com.backendthread.backendthread.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +50,12 @@ public class ThreadService {
 			String response = restTemplate.postForObject(
 					telecomUrl + "/smsc?accountId={accountId}&mobile={mobile}&message={message}", null, String.class,
 					accountId, mobile, message);
+			msg.setTelco_response(response);
+			msg.setSentTs(new Date());
+			msg.setStatus("sent");
+			sendMsgRespository.save(msg);
 
-			sendMsgRespository.updateSendMsg(response, id);
+			//sendMsgRespository.updateSendMsg(response, id);
 
 		}
 		
@@ -67,7 +72,12 @@ public class ThreadService {
 					telecomUrl+"/smsc?accountId={accountId}&mobile={mobile}&message={message}",
 					null, String.class, accountId, mobile, message);
 
-			sendMsgRespository.updateSendMsg(response, id);
+			msg.setTelco_response(response);
+			msg.setSentTs(new Date());
+			msg.setStatus("sent");
+			sendMsgRespository.save(msg);
+			
+//			sendMsgRespository.updateSendMsg(response, id);
 
 		}
 

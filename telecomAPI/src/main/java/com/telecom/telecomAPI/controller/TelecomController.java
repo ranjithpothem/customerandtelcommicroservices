@@ -24,6 +24,8 @@ public class TelecomController {
 	@Value("${internal.db.api.url}")
 	private String dbUrl;
 
+	String uuid =null;
+
 	@PostMapping("/smsc")
 	public String telecomMessage(@RequestParam Long accountId, @RequestParam long mobile,
 			@RequestParam String message) {
@@ -32,8 +34,27 @@ public class TelecomController {
 			return new DTOResponse("REJECTED", "FAILURE", null).toString();
 		}
 
-		String uuid = UUID.randomUUID().toString();
+//		String uuid = UUID.randomUUID().toString();
 		return new DTOResponse("ACCEPTED", "SUCCESS", uuid).toString();
+	}
+
+	// /sendMessaging?mobile={mobile}&message={message}&accountId={accountId}"
+
+	@PostMapping("/sendmsg")
+	public String sendingMessage(@RequestParam("mobile") String mobile, @RequestParam("message") String message,
+			@RequestParam("accountId") Long accountId) {
+
+		String response = restTemplate.postForObject(
+				dbUrl + "/sendMessaging?mobile={mobile}&message={message}&accountId={accountId}", null, String.class,
+				mobile, message, Long.valueOf(accountId));
+		if (response != null) {
+			//return new DTOResponse("ACCEPTED", "SUCCESS", uuid).toString();
+			uuid= UUID.randomUUID().toString();
+			return uuid;
+		}
+
+		//return new DTOResponse("REJECTED", "FAILURE", null).toString();
+		return null;
 	}
 
 }
