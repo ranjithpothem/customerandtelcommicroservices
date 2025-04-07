@@ -3,6 +3,7 @@ package com.telecom.telecomAPI.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,11 @@ public class TelecomController {
 	@Value("${internal.db.api.url}")
 	private String dbUrl;
 
-	String uuid =null;
+	private static String uuid =null;
+	
+	//this is more effective way to create  id in single variable shared in class
+	  private final AtomicReference<String> atomicUuid = new AtomicReference<>();
+
 
 	@PostMapping("/smsc")
 	public String telecomMessage(@RequestParam Long accountId, @RequestParam long mobile,
@@ -35,7 +40,8 @@ public class TelecomController {
 		}
 
 //		String uuid = UUID.randomUUID().toString();
-		return new DTOResponse("ACCEPTED", "SUCCESS", uuid).toString();
+		String currentUuid= atomicUuid.get();
+		return new DTOResponse("ACCEPTED", "SUCCESS", atomicUuid.get()).toString();
 	}
 
 	// /sendMessaging?mobile={mobile}&message={message}&accountId={accountId}"
@@ -49,8 +55,11 @@ public class TelecomController {
 				mobile, message, Long.valueOf(accountId));
 		if (response != null) {
 			//return new DTOResponse("ACCEPTED", "SUCCESS", uuid).toString();
-			uuid= UUID.randomUUID().toString();
-			return uuid;
+			//uuid= UUID.randomUUID().toString();
+			atomicUuid.set(UUID.randomUUID().toString());
+			
+			return atomicUuid.get();
+			//return uuid;
 		}
 
 		//return new DTOResponse("REJECTED", "FAILURE", null).toString();
